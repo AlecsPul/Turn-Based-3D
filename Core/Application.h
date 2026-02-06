@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../utils.h"
 #include <memory>
 
 // Forward declarations
@@ -23,7 +23,7 @@ private:
     // Initialization
     bool Initialize();
     void Shutdown();
-
+    Camera camera;
     // Game loop components
     void ProcessInput();
     void Update(float deltaTime);

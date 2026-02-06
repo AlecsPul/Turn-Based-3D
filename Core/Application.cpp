@@ -3,7 +3,7 @@
 #include "../Engine/Window.h"
 #include "../Rendering/Renderer.h"
 #include "../Gameplay/TurnSystem.h"
-
+#include "Camera.h"
 #include <iostream>
 #include <thread>
 
@@ -99,7 +99,35 @@ void Application::ProcessInput() {
         m_Running = false;
     }
 
-    // Additional input handling could go here
+    
+    //Move camera with WASD while looking at the target
+    float panSpeed = 10.0f;
+    float dt = Time::GetDeltaTime();
+
+    Vector3 pan = {0, 0, 0};
+    if (m_Window->IsKeyDown(GLFW_KEY_W)) pan.z -= panSpeed*dt;
+    if (m_Window->IsKeyDown(GLFW_KEY_A)) pan.x -= panSpeed*dt;
+    if (m_Window->IsKeyDown(GLFW_KEY_S)) pan.z += panSpeed*dt;
+    if (m_Window->IsKeyDown(GLFW_KEY_D)) pan.x += panSpeed*dt;
+    
+    camera.target += pan;
+
+    //Rotate camera with mouse
+    float rotateSpeed = 0.005f;
+    camera.horizontal_rotation += m_Window->GetMouseDX() * rotateSpeed;
+    camera.vertical_angle += m_Window->GetMouseDY() * rotateSpeed;
+
+    camera.vertical_angle = std::clamp(camera.vertical_angle, 0.2618f, 1.3962f);
+
+    //ZOOM
+
+    float zoomSpeed = 2.0f;
+
+    camera.distance_from_target -= m_Window->GetScrollDelta()*zoomSpeed;
+    camera.distance_from_target = std::clamp(camera.distance_from_target,0.0f,10.0f);
+
+    camera.Update();
+
 }
 
 void Application::Update(float deltaTime) {
