@@ -1,6 +1,8 @@
 #pragma once
 #include "../utils.h"
 #include <memory>
+#include "../Engine/Camera.h"
+#include <algorithm>
 
 // Forward declarations
 class Window;

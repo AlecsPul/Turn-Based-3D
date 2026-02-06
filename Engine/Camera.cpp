@@ -5,6 +5,10 @@
 
 Camera::Camera() {
 }
+Camera::~Camera() {
+    // Cleanup code if needed
+}
+
 Vector3 Camera::rotate(Vector3 vector, float y, float x){
     float cosH = std::cos(x);
     float sinH = std::sin(x);

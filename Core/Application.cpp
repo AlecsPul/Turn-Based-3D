@@ -3,7 +3,7 @@
 #include "../Engine/Window.h"
 #include "../Rendering/Renderer.h"
 #include "../Gameplay/TurnSystem.h"
-#include "Camera.h"
+
 #include <iostream>
 #include <thread>
 
@@ -99,7 +99,8 @@ void Application::ProcessInput() {
         m_Running = false;
     }
 
-    
+   
+
     //Move camera with WASD while looking at the target
     float panSpeed = 10.0f;
     float dt = Time::GetDeltaTime();

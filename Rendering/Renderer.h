@@ -1,29 +1,20 @@
 #pragma once
-
+#include <glm/mat4x4.hpp>
 class Window;
 
 class Renderer {
 public:
     Renderer() = default;
     ~Renderer() = default;
+    void SetViewMatrix(const glm::mat4& view);
+    void SetProjectionMatrix(const glm::mat4& projection);
 
-    bool Initialize(Window* window) {
-        m_Window = window;
-        // TODO: Initialize graphics API (OpenGL, Vulkan, DirectX, etc.)
-        return true;
-    }
+    bool Initialize(Window* window);
 
-    void BeginFrame() {
-        // TODO: Begin rendering frame
-    }
+    void BeginFrame();
+    void EndFrame();
 
-    void EndFrame() {
-        // TODO: End rendering frame
-    }
-
-    void Clear(float r, float g, float b, float a) {
-        // TODO: Clear screen with color
-    }
+    void Clear(float r, float g, float b, float a);
 
 private:
     Window* m_Window = nullptr;

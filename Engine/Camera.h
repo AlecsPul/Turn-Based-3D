@@ -1,7 +1,5 @@
 #pragma once
-#include <algorithm>
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
 #include "../utils.h"
 
 class Camera {

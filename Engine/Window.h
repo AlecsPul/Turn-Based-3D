@@ -1,7 +1,9 @@
 #pragma once
-#include <GLFW/glfw3.h>
+
 #include <string>
 #include "../utils.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 struct MouseState{
     double x = 0;
@@ -14,14 +16,14 @@ struct MouseState{
 
 class Window {
 public:
-    
+    static void KeyCallback(GLFWwindow* g_window, int key, int scancode, int action, int mods);
+    static void CursorPosCallback(GLFWwindow* g_window, double xpos, double ypos);
+    static void ScrollCallback(GLFWwindow* g_window, double xoffset, double yoffset);
     bool m_Keys[512] = {};
     MouseState mouse;
     
-    Window(const std::string& title, int width, int height)
-        : m_Title(title), m_Width(width), m_Height(height), m_IsValid(true), m_IsOpen(true) {
-    }
-
+    Window(const std::string& title, int width, int height);
+    ~Window();
     bool IsValid() const { return m_IsValid; }
     bool IsOpen() const { return m_IsOpen; }
     bool ShouldClose() const { return !m_IsOpen; }

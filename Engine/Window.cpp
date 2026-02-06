@@ -1,15 +1,21 @@
-
 #include "Window.h"
 #include <iostream>
 
 
+static void GLFWErrorCallback(int error, const char* description) {
+    std::cerr << "GLFW Error [" << error << "]: " << description << std::endl;
+}
 Window::Window(const std::string& title, int width, int height)
     : m_Title(title), m_Width(width), m_Height(height) {
+        glfwSetErrorCallback(GLFWErrorCallback);
         if(!glfwInit()){
             std::cerr << "Failed to initialize GLFW\n";
             m_IsValid = false;
             return;
         }
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         m_WindowHandle = glfwCreateWindow(width,height,title.c_str(),nullptr,nullptr);
         if(!m_WindowHandle){
@@ -20,11 +26,25 @@ Window::Window(const std::string& title, int width, int height)
         }
 
         glfwMakeContextCurrent(m_WindowHandle);
-        glfwSetWindowUserPointer(m_WindowHandle, this);
-        glfwSetKeyCallback(m_WindowHandle, KeyCallback);
-        glfwSetCursorPosCallback(m_WindowHandle, CursorPosCallback);
-        glfwSetScrollCallback(m_WindowHandle, ScrollCallback);
 
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+            std::cerr << "Failed to initialize GLAD\n";
+            glfwDestroyWindow(m_WindowHandle);
+            glfwTerminate();
+            m_IsValid = false;
+            return;
+        }
+
+        glfwSetWindowUserPointer(m_WindowHandle, this);
+        glfwSetKeyCallback(m_WindowHandle, Window::KeyCallback);
+        glfwSetCursorPosCallback(m_WindowHandle, Window::CursorPosCallback);
+        glfwSetScrollCallback(m_WindowHandle, Window::ScrollCallback);
+
+        m_IsValid = true;
+        m_IsOpen = true;
+
+        std::cout << "GLFW window created successfully. OpenGL version: " 
+                << glGetString(GL_VERSION) << std::endl;
     }
 
 Window::~Window() {
@@ -51,7 +71,7 @@ void Window::PollEvents(){
     }
 }
 
-static void KeyCallback(GLFWwindow* g_window, int key, int scancode, int action, int mods){
+void Window::KeyCallback(GLFWwindow* g_window, int key, int scancode, int action, int mods){
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(g_window));
     if(!window){
         return;
@@ -64,7 +84,7 @@ static void KeyCallback(GLFWwindow* g_window, int key, int scancode, int action,
 }
 
 
-static void CursorPosCallback(GLFWwindow* g_window, double xpos, double ypos){
+void Window::CursorPosCallback(GLFWwindow* g_window, double xpos, double ypos){
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(g_window));
     if(!window){
         return;
@@ -77,7 +97,7 @@ static void CursorPosCallback(GLFWwindow* g_window, double xpos, double ypos){
 
 }
 
-static void ScrollCallback(GLFWwindow* g_window, double xoffset, double yoffset){
+void Window::ScrollCallback(GLFWwindow* g_window, double xoffset, double yoffset){
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(g_window));
     if(!window){
         return;
