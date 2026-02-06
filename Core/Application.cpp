@@ -64,7 +64,7 @@ void Application::Run() {
         Time::Update();
         float frameTime = Time::GetDeltaTime();
 
-        // Cap frame time to prevent spiral of death
+        // Cap frame time to prevent getting stuck in the same frame if the game lags
         if (frameTime > 0.25f) {
             frameTime = 0.25f;
         }

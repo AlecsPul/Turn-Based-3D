@@ -1,0 +1,27 @@
+# Ignore vcpkg installed libraries
+vcpkg/
+vcpkg_installed/
+installed/
+
+# Ignore downloaded libraries (e.g., GLM)
+external/
+glm/
+
+# Ignore Python virtual environments
+venv/
+
+# VS Code settings
+.vscode/
+
+# Build outputs
+build/
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
