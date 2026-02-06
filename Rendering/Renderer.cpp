@@ -29,3 +29,11 @@ void Renderer::Clear(float r, float g, float b, float a) {
 void Renderer::EndFrame() {
     // nothing yet
 }
+
+void Renderer::SetProjectionMatrix(const glm::mat4& projection) {
+    m_ProjectionMatrix = projection;
+}
+
+void Renderer::SetViewMatrix(const glm::mat4& view) {
+    m_ViewMatrix = view;
+}

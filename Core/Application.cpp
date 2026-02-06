@@ -4,6 +4,7 @@
 #include "../Rendering/Renderer.h"
 #include "../Gameplay/TurnSystem.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <thread>
 
@@ -36,6 +37,34 @@ bool Application::Initialize() {
     m_TurnSystem = std::make_unique<TurnSystem>();
 
     std::cout << "Application initialized successfully!\n";
+
+    std::vector<glm::vec3> gridVertices;
+    int size = 10;
+    for(int i=-size;i<=size;i++){
+        gridVertices.push_back({(float)i,0.f,(float)-size});
+        gridVertices.push_back({(float)i,0.f,(float)size});
+        gridVertices.push_back({(float)-size,0.f,(float)i});
+        gridVertices.push_back({(float)size,0.f,(float)i});
+    }
+
+    m_GridMesh = std::make_unique<Mesh>(gridVertices);
+    const char* vertexSrc = R"(
+    #version 330 core
+    layout(location = 0) in vec3 aPos;
+    uniform mat4 uView;
+    uniform mat4 uProjection;
+    void main() {
+        gl_Position = uProjection * uView * vec4(aPos, 1.0);
+    })";
+
+    const char* fragmentSrc = R"(
+    #version 330 core
+    out vec4 FragColor;
+    void main() {
+        FragColor = vec4(0.8, 0.8, 0.8, 1.0);
+    })";
+
+    m_GridShader = std::make_unique<Shader>(vertexSrc, fragmentSrc);
     return true;
 }
 
@@ -100,26 +129,31 @@ void Application::ProcessInput() {
     }
 
    
-
-    //Move camera with WASD while looking at the target
-    float panSpeed = 10.0f;
+    Vector3 forward = normalize(camera.target - camera.camera_position);
+    forward.y = 0; // Keep movement in the horizontal plane
+    Vector3 right = normalize(cross(forward, camera.up));
+    //Move camera with WASD
+    
     float dt = Time::GetDeltaTime();
+    float panSpeed = 10.0f*dt;
 
     Vector3 pan = {0, 0, 0};
-    if (m_Window->IsKeyDown(GLFW_KEY_W)) pan.z -= panSpeed*dt;
-    if (m_Window->IsKeyDown(GLFW_KEY_A)) pan.x -= panSpeed*dt;
-    if (m_Window->IsKeyDown(GLFW_KEY_S)) pan.z += panSpeed*dt;
-    if (m_Window->IsKeyDown(GLFW_KEY_D)) pan.x += panSpeed*dt;
+    if (m_Window->IsKeyDown(GLFW_KEY_W)) pan += forward * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_A)) pan -= right * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_S)) pan -= forward * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_D)) pan += right * panSpeed;
     
     camera.target += pan;
 
     //Rotate camera with mouse
-    float rotateSpeed = 0.005f;
-    camera.horizontal_rotation += m_Window->GetMouseDX() * rotateSpeed;
-    camera.vertical_angle += m_Window->GetMouseDY() * rotateSpeed;
+    
+    if(m_Window->IsMouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)){
+        float rotateSpeed = 0.005f;
+        camera.horizontal_rotation -= m_Window->GetMouseDX() * rotateSpeed;
+        camera.vertical_angle += m_Window->GetMouseDY() * rotateSpeed;
 
-    camera.vertical_angle = std::clamp(camera.vertical_angle, 0.2618f, 1.3962f);
-
+        camera.vertical_angle = std::clamp(camera.vertical_angle, 0.2618f, 1.3962f);
+    }
     //ZOOM
 
     float zoomSpeed = 2.0f;
@@ -147,11 +181,26 @@ void Application::Render() {
     // Render game world
     m_Renderer->Clear(0.1f, 0.1f, 0.15f, 1.0f);
 
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+        (float)m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
+    glm::mat4 view = camera.GetViewMatrix();
+
+    
+    m_Renderer->SetProjectionMatrix(projection);
+    m_Renderer->SetViewMatrix(view);
+
+    if (m_GridMesh && m_GridShader){
+        m_GridShader->Use();
+        m_GridShader->SetMat4("uView", camera.GetViewMatrix());
+        m_GridShader->SetMat4("uProjection", projection);
+        m_GridMesh->Draw();
+
+    }
     // Render game objects here...
     if (m_TurnSystem) {
         m_TurnSystem->Render(m_Renderer.get());
     }
-
+    
     // End rendering and present
     m_Renderer->EndFrame();
     m_Window->SwapBuffers();

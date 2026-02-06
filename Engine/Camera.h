@@ -12,18 +12,19 @@ public:
     Vector3 base_offset;
     Vector3 rotated_offset;
     Vector3 up = {0,1,0};
-    float horizontal_rotation = 0; //(yaw) Angle in radians 
-    float vertical_angle = 0; //(pitch) Either fixed value or clamp it decide on implement
-    float rotation_speed;
-    float distance_from_target;
+    float distance_from_target = 5.0f; // zoom distance
+    float horizontal_rotation = 0.0f;  // yaw (radians)
+    float vertical_angle = 1.0f;       // pitch (radians)
+    float rotation_speed = 1.0f;
     void Update();
    
 
-    float fov;
-    float aspect_ratio;
+    float fov = 45.0f;
+    float aspect_ratio = 16.f / 9.f;
+    float near_plane = 0.1f;
+    float far_plane = 100.f;
 
-    float near_plane;
-    float far_plane;
+    glm::mat4 GetViewMatrix() const { return view_matrix; }
 
 private:
     Vector3 rotate(Vector3, float, float);

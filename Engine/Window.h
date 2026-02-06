@@ -30,7 +30,7 @@ public:
 
     void PollEvents();
     void SwapBuffers();
-
+    bool IsMouseButtonDown(int button);
     int GetWidth() const { return m_Width; }
     int GetHeight() const { return m_Height; }
     bool IsKeyDown(int key) const { return m_Keys[key]; }

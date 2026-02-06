@@ -105,3 +105,7 @@ void Window::ScrollCallback(GLFWwindow* g_window, double xoffset, double yoffset
 
     window->mouse.scroll += yoffset;
 }
+
+bool Window::IsMouseButtonDown(int button){
+    return glfwGetMouseButton(m_WindowHandle, button) == GLFW_PRESS;
+}
