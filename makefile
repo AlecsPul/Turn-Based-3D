@@ -6,6 +6,7 @@ SRC = main.cpp \
       $(shell find Core -name "*.cpp") \
       $(shell find Engine -name "*.cpp") \
       $(shell find Rendering -name "*.cpp") \
+      $(shell find World -name "*.cpp") \
       ThirdParty/glad/src/glad.c
 
 TARGET = TurnBased3D

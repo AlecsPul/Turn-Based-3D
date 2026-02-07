@@ -3,6 +3,7 @@
 #include "../Engine/Window.h"
 #include "../Rendering/Renderer.h"
 #include "../Gameplay/TurnSystem.h"
+#include "../World/Grid.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -35,36 +36,9 @@ bool Application::Initialize() {
 
     // Create game systems
     m_TurnSystem = std::make_unique<TurnSystem>();
+    m_Grid = std::make_unique<Grid>(10, 10);
 
     std::cout << "Application initialized successfully!\n";
-
-    std::vector<glm::vec3> gridVertices;
-    int size = 10;
-    for(int i=-size;i<=size;i++){
-        gridVertices.push_back({(float)i,0.f,(float)-size});
-        gridVertices.push_back({(float)i,0.f,(float)size});
-        gridVertices.push_back({(float)-size,0.f,(float)i});
-        gridVertices.push_back({(float)size,0.f,(float)i});
-    }
-
-    m_GridMesh = std::make_unique<Mesh>(gridVertices);
-    const char* vertexSrc = R"(
-    #version 330 core
-    layout(location = 0) in vec3 aPos;
-    uniform mat4 uView;
-    uniform mat4 uProjection;
-    void main() {
-        gl_Position = uProjection * uView * vec4(aPos, 1.0);
-    })";
-
-    const char* fragmentSrc = R"(
-    #version 330 core
-    out vec4 FragColor;
-    void main() {
-        FragColor = vec4(0.8, 0.8, 0.8, 1.0);
-    })";
-
-    m_GridShader = std::make_unique<Shader>(vertexSrc, fragmentSrc);
     return true;
 }
 
@@ -189,13 +163,11 @@ void Application::Render() {
     m_Renderer->SetProjectionMatrix(projection);
     m_Renderer->SetViewMatrix(view);
 
-    if (m_GridMesh && m_GridShader){
-        m_GridShader->Use();
-        m_GridShader->SetMat4("uView", camera.GetViewMatrix());
-        m_GridShader->SetMat4("uProjection", projection);
-        m_GridMesh->Draw();
-
+    // Render grid with its model matrix
+    if (m_Grid) {
+        m_Grid->Draw(*m_Renderer);
     }
+    
     // Render game objects here...
     if (m_TurnSystem) {
         m_TurnSystem->Render(m_Renderer.get());

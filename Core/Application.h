@@ -3,13 +3,12 @@
 #include <memory>
 #include "../Engine/Camera.h"
 #include <algorithm>
-#include "../Rendering/Mesh.h"
-#include "../Rendering/Shader.h"
 
 // Forward declarations
 class Window;
 class Renderer;
 class TurnSystem;
+class Grid;
 
 class Application {
 public:
@@ -37,8 +36,7 @@ private:
     std::unique_ptr<Window> m_Window;
     std::unique_ptr<Renderer> m_Renderer;
     std::unique_ptr<TurnSystem> m_TurnSystem;
-    std::unique_ptr<Mesh> m_GridMesh;
-    std::unique_ptr<Shader> m_GridShader;
+    std::unique_ptr<Grid> m_Grid;
 
     // Loop control
     bool m_Running;

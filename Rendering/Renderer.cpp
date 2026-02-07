@@ -37,3 +37,11 @@ void Renderer::SetProjectionMatrix(const glm::mat4& projection) {
 void Renderer::SetViewMatrix(const glm::mat4& view) {
     m_ViewMatrix = view;
 }
+
+void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, glm::mat4 model_matrix){
+    shader.Use();
+    shader.SetMat4("uModel", model_matrix);
+    shader.SetMat4("uView", m_ViewMatrix);
+    shader.SetMat4("uProjection", m_ProjectionMatrix);
+    mesh.Draw();
+}

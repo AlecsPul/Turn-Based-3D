@@ -12,7 +12,7 @@ public:
     ~Renderer() = default;
     void SetViewMatrix(const glm::mat4& view);
     void SetProjectionMatrix(const glm::mat4& projection);
-
+    void DrawMesh(const Mesh& mesh, const Shader& shader, glm::mat4 model_matrix);
     bool Initialize(Window* window);
 
     void BeginFrame();
