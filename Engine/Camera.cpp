@@ -5,22 +5,17 @@
 
 Camera::Camera() {
 }
-Vector3 Camera::rotate(Vector3 vector, float y, float x){
-    float cosH = std::cos(x);
-    float sinH = std::sin(x);
-    float cosV = std::cos(y);
-    float sinV = std::sin(y);
-
-    float x1 = vector.x * cosH - vector.z * sinH;
-    float z1 = vector.x * sinH + vector.z * cosH;
-    float y1 = vector.y;
-
-    float x2 = x1;
-    float z2 = y1 * sinV + z1*cosV;
-    float y2 = y1 * cosV - z1*sinV;
-    
-    return {x2,y2,z2};
+Camera::~Camera() {
+    // Cleanup code if needed
 }
+
+Vector3 Camera::rotate(Vector3 vector, float y, float x) {
+    float x1 = vector.z * sin(x) * cos(y);
+    float z1 = vector.z * cos(x) * cos(y);
+    float y1 = vector.z * sin(y);
+    return {x1, y1, z1};
+}
+
 
 void Camera::Update(){
     base_offset = {0,0,distance_from_target};

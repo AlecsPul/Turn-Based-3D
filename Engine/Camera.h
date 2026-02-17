@@ -1,44 +1,38 @@
 #pragma once
-#include <algorithm>
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
-
-struct Vector3 {
-    float x, y, z;
-
-    Vector3 operator+(const Vector3& other) const {
-        return {x+other.x,y+other.y,z+other.z};
-    }
-};
+#include "../utils.h"
 
 class Camera {
 public:
     Camera();
     ~Camera();
-   
-
-private:
-    Vector3 rotate(Vector3, float, float);
-    void Update();
-
     Vector3 camera_position;
     // Camera properties will be added later
     Vector3 target = {0,0,0};
     Vector3 base_offset;
     Vector3 rotated_offset;
     Vector3 up = {0,1,0};
+    float distance_from_target = 5.0f; // zoom distance
+    float horizontal_rotation = 0.0f;  // yaw (radians)
+    float vertical_angle = 1.0f;       // pitch (radians)
+    float rotation_speed = 1.0f;
+    void Update();
+   
+
+    float fov = 45.0f;
+    float aspect_ratio = 16.f / 9.f;
+    float near_plane = 0.1f;
+    float far_plane = 100.f;
+
+    glm::mat4 GetViewMatrix() const { return view_matrix; }
+
+private:
+    Vector3 rotate(Vector3, float, float);
     
+
+   
     glm::mat4 view_matrix;
+    glm::mat4 projection_matrix;
 
-    float distance_from_target;
-    
-    float horizontal_rotation = 0; //(yaw) Angle in radians 
-    float vertical_angle = 0; //(pitch) Either fixed value or clamp it decide on implement
-    float rotation_speed;
-
-    float fov;
-    float aspect_ratio;
-
-    float near_plane;
-    float far_plane;
+   
 };

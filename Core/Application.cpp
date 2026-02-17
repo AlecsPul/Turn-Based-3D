@@ -3,7 +3,9 @@
 #include "../Engine/Window.h"
 #include "../Rendering/Renderer.h"
 #include "../Gameplay/TurnSystem.h"
+#include "../World/Grid.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <thread>
 
@@ -34,6 +36,7 @@ bool Application::Initialize() {
 
     // Create game systems
     m_TurnSystem = std::make_unique<TurnSystem>();
+    m_Grid = std::make_unique<Grid>(10, 10);
 
     std::cout << "Application initialized successfully!\n";
     return true;
@@ -99,7 +102,41 @@ void Application::ProcessInput() {
         m_Running = false;
     }
 
-    // Additional input handling could go here
+   
+    Vector3 forward = normalize(camera.target - camera.camera_position);
+    forward.y = 0; // Keep movement in the horizontal plane
+    Vector3 right = normalize(cross(forward, camera.up));
+    //Move camera with WASD
+    
+    float dt = Time::GetDeltaTime();
+    float panSpeed = 10.0f*dt;
+
+    Vector3 pan = {0, 0, 0};
+    if (m_Window->IsKeyDown(GLFW_KEY_W)) pan += forward * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_A)) pan -= right * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_S)) pan -= forward * panSpeed;
+    if (m_Window->IsKeyDown(GLFW_KEY_D)) pan += right * panSpeed;
+    
+    camera.target += pan;
+
+    //Rotate camera with mouse
+    
+    if(m_Window->IsMouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)){
+        float rotateSpeed = 0.005f;
+        camera.horizontal_rotation -= m_Window->GetMouseDX() * rotateSpeed;
+        camera.vertical_angle += m_Window->GetMouseDY() * rotateSpeed;
+
+        camera.vertical_angle = std::clamp(camera.vertical_angle, 0.2618f, 1.3962f);
+    }
+    //ZOOM
+
+    float zoomSpeed = 2.0f;
+
+    camera.distance_from_target -= m_Window->GetScrollDelta()*zoomSpeed;
+    camera.distance_from_target = std::clamp(camera.distance_from_target,0.0f,10.0f);
+
+    camera.Update();
+
 }
 
 void Application::Update(float deltaTime) {
@@ -118,11 +155,24 @@ void Application::Render() {
     // Render game world
     m_Renderer->Clear(0.1f, 0.1f, 0.15f, 1.0f);
 
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+        (float)m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
+    glm::mat4 view = camera.GetViewMatrix();
+
+    
+    m_Renderer->SetProjectionMatrix(projection);
+    m_Renderer->SetViewMatrix(view);
+
+    // Render grid with its model matrix
+    if (m_Grid) {
+        m_Grid->Draw(*m_Renderer);
+    }
+    
     // Render game objects here...
     if (m_TurnSystem) {
         m_TurnSystem->Render(m_Renderer.get());
     }
-
+    
     // End rendering and present
     m_Renderer->EndFrame();
     m_Window->SwapBuffers();

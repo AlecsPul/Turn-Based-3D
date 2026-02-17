@@ -1,11 +1,14 @@
 #pragma once
-
+#include "../utils.h"
 #include <memory>
+#include "../Engine/Camera.h"
+#include <algorithm>
 
 // Forward declarations
 class Window;
 class Renderer;
 class TurnSystem;
+class Grid;
 
 class Application {
 public:
@@ -23,7 +26,7 @@ private:
     // Initialization
     bool Initialize();
     void Shutdown();
-
+    Camera camera;
     // Game loop components
     void ProcessInput();
     void Update(float deltaTime);
@@ -33,6 +36,7 @@ private:
     std::unique_ptr<Window> m_Window;
     std::unique_ptr<Renderer> m_Renderer;
     std::unique_ptr<TurnSystem> m_TurnSystem;
+    std::unique_ptr<Grid> m_Grid;
 
     // Loop control
     bool m_Running;
