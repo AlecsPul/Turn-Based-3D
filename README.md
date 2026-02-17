@@ -23,6 +23,3 @@ The goal of this project is to create a turn-based 3D RPG inspired by classic tu
 2. Install the required libraries (see above).
 3. Use CMake to configure and build the project.
 
-## Notes
-- The codebase is modular, with separate folders for core logic, engine, gameplay, rendering, UI, and world management.
-- Contributions and suggestions are welcome as the project evolves.
